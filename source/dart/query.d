@@ -785,8 +785,7 @@ class SelectBuilder : QueryBuilder {
     static
     SelectBuilder lastInsertId() {
         return new SelectBuilder()
-            .selectFunc("MAX","_ROWID_")
-            .from("test_record");
+            .selectFunc("MAX",["_ROWID_"]);
     }
 
     /**

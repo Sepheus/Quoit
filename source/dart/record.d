@@ -156,7 +156,7 @@ class Record(Type) {
         /**
          * Executes a query that produces a result set.
          **/
-        ResultRange executeQueryResult(QueryBuilder query) {
+        CachedResults executeQueryResult(QueryBuilder query) {
             import std.stdio : writeln;
             // Get a database connection.
             auto conn = getDBConnection;
@@ -176,7 +176,7 @@ class Record(Type) {
                     command.bind(i, p);
                 }
             }
-            ResultRange result = command.execute();
+            CachedResults result = command.execute().cached();
             command.reset();
             return result;
         }
@@ -383,25 +383,24 @@ mixin template ActiveRecord() {
         auto query = getQueryForGet(key);
 
         // Execute the get() query.
-        ResultRange result = executeQueryResult(query);
+        auto result = executeQueryResult(query);
         import std.stdio : writeln;
         result.writeln;
 
         // Check that we got a result.
-        if(result.empty) {
+        if(result.length < 1) {
             throw new RecordException("No records found for " ~
                     getTableName ~ " at " ~ to!string(key));
         }
 
-        //TODO: Why is there a blank row?
-        result.popFront();
-        auto row = result.front;
+        auto row = result[0];
         auto instance = new Type;
 
         // Bind column values to fields.
-        foreach(ulong idx; 0 .. row.length) {
-            Variant value = row.peek!string(idx);
-            getColumnBindings(row.columnName(idx)).set(instance, value);
+        foreach(idx, col; getColumnNames) {
+            //FIXME Fix instance where a column is omitted.
+            Variant value = row[col].as!string;
+            getColumnBindings(col).set(instance, value);
         }
 
         // Return the instance.
@@ -416,21 +415,20 @@ mixin template ActiveRecord() {
         auto query = getQueryForFind(conditions, limit);
 
         // Execute the find() query.
-        ResultRange result = executeQueryResult(query);
+        auto result = executeQueryResult(query);
 
         // Check that we got a result.
-        if(result.empty) return [];
+        if(result.length < 1) return [];
 
         Type[] array;
-        //TODO: Why is there a blank row?
-        result.popFront();
         // Create the initial array of elements.
-        foreach(Row row; result) {
+        foreach(row; result) {
             auto instance = new Type;
 
-            foreach(ulong idx; 0 .. row.length) {
-                Variant value = row.peek!string(idx);
-                getColumnBindings(row.columnName(idx)).set(instance, value);
+            foreach(col; getColumnNames) {
+                //FIXME: Fix instance where a column is omitted.
+                Variant value = row[col].as!string;
+                getColumnBindings(col).set(instance, value);
             }
 
             // Append the object.
@@ -462,8 +460,8 @@ mixin template ActiveRecord() {
         auto info = getColumnBindings(getIdColumn);
         if(info.autoIncrement) {
             // Fetch the last insert id.
-            query = SelectBuilder.lastInsertId;
-            Variant id = executeQueryResult(query).oneValue!ulong;
+            query = SelectBuilder.lastInsertId.from(getTableName);
+            Variant id = executeQueryResult(query)[0][0].as!int;
             // Update the auto incremented column.
             info.set(this, id);
         }
