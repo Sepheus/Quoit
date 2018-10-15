@@ -20,8 +20,8 @@ class TestRecord : Record!TestRecord {
     int type;
 
     static this() {
-        auto db = Database(":memory:");
-        db.run("CREATE TABLE test_record (id INTEGER PRIMARY KEY, name CHAR(5), type INTEGER)");
+        auto db = Database("test.db");
+        db.run("DROP TABLE test_record; CREATE TABLE test_record (id INTEGER PRIMARY KEY, name CHAR(5), type INTEGER)");
         setDBConnection(db);
     }
 
@@ -34,8 +34,7 @@ unittest {
     record.name = "Test";
     record.type = 1;
     record.create;
-    //assert(record.id != 0);
-    assert(record.id == 0);
+    assert(record.id != 0);
 
     // Fetch the created record.
     record = TestRecord.get(record.id);
@@ -72,6 +71,12 @@ unittest {
     assert(records[0].name == "Test2");
     assert(records[0].type == 3);
 
+
+    auto record2 = new TestRecord;
+    record2.name = "New";
+    record2.type = 4;
+    record2.create;
+
     // Test max-length.
     try {
         record.name = "Test123";
@@ -97,6 +102,7 @@ unittest {
     // Test record remove.
     record = records[0];
     record.remove;
+    "Record ID: %s".writefln(record.id);
 
     // Check that the record doens't exist.
     try {
@@ -108,7 +114,72 @@ unittest {
         // Success.
     }
 
+    record.name = "Bob";
+    record.type = 7;
+    record.create;
+
 }
+
+@Table("users")
+class UserRecord : Record!UserRecord
+{
+
+    mixin ActiveRecord!();
+
+    static this()
+    {
+        // Connect to a database.
+        auto db = Database("test.db");
+        db.run("DROP TABLE users; CREATE TABLE users (id INTEGER PRIMARY KEY, username CHAR(32), pass_hash CHAR(64), status CHAR(20), last_online BIGINT)");
+        setDBConnection(db);
+    }
+
+    @Id
+    @AutoIncrement
+    uint id;
+
+    @Column
+    @MaxLength(32)
+    string username;
+
+    @Column("pass_hash")
+    @MaxLength(64)
+    string passwordHash;
+
+    @Column
+    @Nullable
+    string status;
+
+    @Column("last_online")
+    ulong lastOnline;
+
+}
+
+void deleteUserById(uint id) {
+    UserRecord user = UserRecord.get(id);
+    user.remove;
+}
+
+void updateUserStatus(uint id, string status) {
+    UserRecord user = UserRecord.get(id);
+    user.status = status;
+    user.save;
+}
+
+UserRecord[] findUsersWithStatus(string status) {
+    return UserRecord.find(["status": status]);
+}
+
+unittest {
+    auto user = new UserRecord;
+    user.username = "Jenkins";
+    user.passwordHash = "abc";
+    user.status = "Exploring";
+    user.lastOnline = 144141550;
+    user.create;
+}
+
+
 
 /* - Compound Fields - */
 /* - - - - - - - - - - */

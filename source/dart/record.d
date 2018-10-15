@@ -166,15 +166,7 @@ class Record(Type) {
             // Bind parameters and execute.
             query.getParameters.writeln;
             foreach(int i, param; query.getParameters) {
-                i++;
-                if(param.type == typeid(int)) {
-                    int p = param.get!(int);
-                    command.bind(i, p);
-                }
-                else if(param.type == typeid(string)) { 
-                    string p = param.get!(string);
-                    command.bind(i, p);
-                }
+                command.bind(++i, param.to!string);
             }
             CachedResults result = command.execute().cached();
             command.reset();
@@ -194,15 +186,7 @@ class Record(Type) {
             // Bind parameters and execute.
             query.getParameters.writeln;
             foreach(int i, param; query.getParameters) {
-                i++;
-                if(param.type == typeid(int)) {
-                    int p = param.get!(int);
-                    command.bind(i, p);
-                }
-                else if(param.type == typeid(string)) { 
-                    string p = param.get!(string);
-                    command.bind(i, p);
-                }
+                command.bind(++i, param.to!string);
             }
             command.execute();
             command.reset();
@@ -444,6 +428,17 @@ mixin template ActiveRecord() {
      **/
     void create() {
 		import std.array;
+
+        // Update auto increment columns.
+        auto info = getColumnBindings(getIdColumn);
+        if(info.autoIncrement) {
+            // Fetch the last insert id.
+            QueryBuilder query = SelectBuilder.lastInsertId.from(getTableName);
+            Variant id = executeQueryResult(query)[0][0].as!size_t + 1;
+            // Update the auto incremented column.
+            info.set(this, id);
+        }
+
         // Get the query for the operation.
         QueryBuilder query = getQueryForCreate(this);
 
@@ -456,15 +451,6 @@ mixin template ActiveRecord() {
                     Type.stringof ~ " by create().");
         }
 
-        // Update auto increment columns.
-        auto info = getColumnBindings(getIdColumn);
-        if(info.autoIncrement) {
-            // Fetch the last insert id.
-            query = SelectBuilder.lastInsertId.from(getTableName);
-            Variant id = executeQueryResult(query)[0][0].as!int;
-            // Update the auto incremented column.
-            info.set(this, id);
-        }
     }
 
     /**

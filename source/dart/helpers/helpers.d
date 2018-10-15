@@ -123,7 +123,7 @@ static bool isJoinColumn(Type, string member)() {
  * Determines the name of a column field.
  **/
 static string getColumnDefinition(Type, string member)() {
-    string result;
+    string result = member;
     // Search for @Column annotation.
     static foreach(annotation; __traits(getAttributes,
             __traits(getMember, Type, member))) {
@@ -132,11 +132,8 @@ static string getColumnDefinition(Type, string member)() {
             result = member;
         }
         // Check if @Column("name") is present.
-        else static if(is(typeof(annotation) == Column)) {
+        static if(is(typeof(annotation) == Column)) {
             result = annotation.name;
-        }
-        else { 
-            result = member;
         }
     }
     return result;
