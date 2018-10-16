@@ -1,7 +1,7 @@
 Quoit
 ====
 
-A fork of [Quoit](https://github.com/Mihail-K/Dart) Active Record implementation for DLang and SQLite3.
+A fork of [Dart](https://github.com/Mihail-K/Dart) Active Record implementation for DLang and SQLite3.
 
 How-To
 ------
