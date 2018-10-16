@@ -10,3 +10,4 @@ __dummy.html
 *.so
 *.selections.json
 *-workspace
+*.db

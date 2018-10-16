@@ -1,5 +1,5 @@
 
-module dart.query;
+module quoit.query;
 
 import std.array;
 import std.conv;

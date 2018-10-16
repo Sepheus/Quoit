@@ -1,5 +1,5 @@
 {
-	"name": "activerecord",
+	"name": "quoit",
 	"license": "MIT",
 	"description": "D Active Record Types",
 	"copyright": "Copyright © 2018, Mihail K, Sepheus",
@@ -16,7 +16,7 @@
 			"excludedSourceFiles": [
 				"source/app.d"
 			],
-			"targetName": "activerecord",
+			"targetName": "quoit",
 			"targetType": "library",
 			"libs" : ["lib/win64/sqlite3"]
 		}

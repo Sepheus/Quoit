@@ -1,7 +1,7 @@
 
-module dart.tests.common;
+module quoit.tests.common;
 
-import dart.record;
+import quoit.record;
 
 @Table("test_record")
 class TestRecord : Record!TestRecord {
@@ -20,8 +20,8 @@ class TestRecord : Record!TestRecord {
     int type;
 
     static this() {
-        auto db = Database("test.db");
-        db.run("DROP TABLE test_record; CREATE TABLE test_record (id INTEGER PRIMARY KEY, name CHAR(5), type INTEGER)");
+        auto db = SQLiteDB(":memory:");
+        db.run("CREATE TABLE test_record (id INTEGER PRIMARY KEY, name CHAR(5), type INTEGER)");
         setDBConnection(db);
     }
 
@@ -129,8 +129,8 @@ class UserRecord : Record!UserRecord
     static this()
     {
         // Connect to a database.
-        auto db = Database("test.db");
-        db.run("DROP TABLE users; CREATE TABLE users (id INTEGER PRIMARY KEY, username CHAR(32), pass_hash CHAR(64), status CHAR(20), last_online BIGINT)");
+        auto db = SQLiteDB(":memory:");
+        db.run("CREATE TABLE users (id INTEGER PRIMARY KEY, username CHAR(32), pass_hash CHAR(64), status CHAR(20), last_online BIGINT)");
         setDBConnection(db);
     }
 
@@ -177,6 +177,7 @@ unittest {
     user.status = "Exploring";
     user.lastOnline = 144141550;
     user.create;
+    user.id.updateUserStatus("In Town");
 }
 
 

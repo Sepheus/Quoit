@@ -1,5 +1,5 @@
 
-module dart.helpers.attributes;
+module quoit.helpers.attributes;
 
 /**
  * Table annotation type.

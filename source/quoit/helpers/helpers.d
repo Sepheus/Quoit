@@ -1,10 +1,10 @@
 
-module dart.helpers.helpers;
+module quoit.helpers.helpers;
 
 import std.variant;
 
-import dart.record;
-import dart.helpers.attributes;
+import quoit.record;
+import quoit.helpers.attributes;
 
 class ColumnBindings {
 

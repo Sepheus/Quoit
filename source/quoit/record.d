@@ -1,5 +1,5 @@
 
-module dart.record;
+module quoit.record;
 
 import std.array;
 import std.format;
@@ -8,11 +8,12 @@ public import std.conv;
 public import std.traits;
 public import std.variant;
 
-public import d2sqlite3;
+import d2sqlite3;
 
-public import dart.query;
-public import dart.helpers.attributes;
-public import dart.helpers.helpers;
+public import quoit.query;
+public import quoit.helpers.attributes;
+public import quoit.helpers.helpers;
+public import quoit.quoit;
 
 /**
  * Exception type produced by record operations.
@@ -161,15 +162,15 @@ class Record(Type) {
             // Get a database connection.
             auto conn = getDBConnection;
             query.build.writeln;
-			auto command = conn.prepare(query.build);
+			auto stmt = conn.prepare(query.build);
             
             // Bind parameters and execute.
             query.getParameters.writeln;
             foreach(int i, param; query.getParameters) {
-                command.bind(++i, param.to!string);
+                stmt.bind(++i, param.to!string);
             }
-            CachedResults result = command.execute().cached();
-            command.reset();
+            CachedResults result = stmt.execute().cached();
+            stmt.reset();
             return result;
         }
 
@@ -182,14 +183,14 @@ class Record(Type) {
             auto conn = getDBConnection;
 			//Prepare the query.
             query.build.writeln;
-            auto command = conn.prepare(query.build);
+            auto stmt = conn.prepare(query.build);
             // Bind parameters and execute.
             query.getParameters.writeln;
             foreach(int i, param; query.getParameters) {
-                command.bind(++i, param.to!string);
+                stmt.bind(++i, param.to!string);
             }
-            command.execute();
-            command.reset();
+            stmt.execute();
+            stmt.reset();
             return conn.totalChanges;
         }
 
