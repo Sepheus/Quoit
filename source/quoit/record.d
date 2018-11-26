@@ -1,4 +1,3 @@
-
 module quoit.record;
 
 import std.array;
@@ -14,6 +13,8 @@ public import quoit.query;
 public import quoit.helpers.attributes;
 public import quoit.helpers.helpers;
 public import quoit.quoit;
+
+//TODO: Coerce into bool type.
 
 /**
  * Exception type produced by record operations.
@@ -158,14 +159,11 @@ class Record(Type) {
          * Executes a query that produces a result set.
          **/
         CachedResults executeQueryResult(QueryBuilder query) {
-            import std.stdio : writeln;
             // Get a database connection.
             auto conn = getDBConnection;
-            query.build.writeln;
 			auto stmt = conn.prepare(query.build);
             
             // Bind parameters and execute.
-            query.getParameters.writeln;
             foreach(int i, param; query.getParameters) {
                 stmt.bind(++i, param.to!string);
             }
@@ -178,14 +176,11 @@ class Record(Type) {
          * Executes a query that doesn't produce a result set.
          **/
         ulong executeQuery(QueryBuilder query) {
-            import std.stdio : writeln;
             // Get a database connection.
             auto conn = getDBConnection;
 			//Prepare the query.
-            query.build.writeln;
             auto stmt = conn.prepare(query.build);
             // Bind parameters and execute.
-            query.getParameters.writeln;
             foreach(int i, param; query.getParameters) {
                 stmt.bind(++i, param.to!string);
             }
@@ -280,7 +275,7 @@ mixin template ActiveRecord() {
      * Alias to the local type.
      **/
     alias Type = Target!(__traits(parent, get));
-
+    mixin Helpers;
     /**
      * Static initializer for column info.
      **/
@@ -369,8 +364,6 @@ mixin template ActiveRecord() {
 
         // Execute the get() query.
         auto result = executeQueryResult(query);
-        import std.stdio : writeln;
-        result.writeln;
 
         // Check that we got a result.
         if(result.length < 1) {

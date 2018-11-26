@@ -21,7 +21,8 @@ class UserRecord : Record!UserRecord
     static this()
     {
         // Connect to a database.
-        setDBConnection( . . . );
+        auto db = SQLiteDB("db/mydbforexample.db");
+        setDBConnection(db);
     }
 
     @Id
