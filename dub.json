@@ -10,15 +10,28 @@
 	"dependencies": {
 		"d2sqlite3": "~>0.17.1"
 	},
+	"subConfigurations": {
+		"d2sqlite3": "all-included"
+	},
 	"configurations": [
 		{
-			"name": "library",
+			"name": "library-windows",
 			"excludedSourceFiles": [
 				"source/app.d"
 			],
 			"targetName": "quoit",
 			"targetType": "library",
+			"platforms": ["windows"],
 			"libs" : ["lib/win64/sqlite3"]
+		},
+		{
+			"name": "library-linux",
+			"excludedSourceFiles": [
+				"source/app.d"
+			],
+			"targetName": "quoit",
+			"targetType": "library",
+			"platforms": ["linux"]
 		}
 	],
 	"targetType": "library"
