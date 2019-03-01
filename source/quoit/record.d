@@ -164,8 +164,8 @@ class Record(Type) {
 			auto stmt = conn.prepare(query.build);
             
             // Bind parameters and execute.
-            foreach(int i, param; query.getParameters) {
-                stmt.bind(++i, param.to!string);
+            foreach(i, param; query.getParameters) {
+                stmt.bind((++i).to!int, param.to!string);
             }
             CachedResults result = stmt.execute().cached();
             stmt.reset();
@@ -181,8 +181,8 @@ class Record(Type) {
 			//Prepare the query.
             auto stmt = conn.prepare(query.build);
             // Bind parameters and execute.
-            foreach(int i, param; query.getParameters) {
-                stmt.bind(++i, param.to!string);
+            foreach(i, param; query.getParameters) {
+                stmt.bind((++i).to!int, param.to!string);
             }
             stmt.execute();
             stmt.reset();

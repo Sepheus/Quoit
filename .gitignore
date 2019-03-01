@@ -11,3 +11,5 @@ __dummy.html
 *.selections.json
 *-workspace
 *.db
+*.a
+quoit-test-*
